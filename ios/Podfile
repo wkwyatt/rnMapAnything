@@ -7,4 +7,6 @@ target 'rnMapAnything' do
   pod 'GoogleMaps', '2.2.0'
   pod 'GooglePlaces', '2.2.0'
   pod 'GooglePlacePicker', '2.2.0'
+  pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
+
 end

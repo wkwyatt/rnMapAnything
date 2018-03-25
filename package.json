@@ -16,6 +16,7 @@
     "react-native-google-places": "^2.4.2",
     "react-native-maps": "^0.20.1",
     "react-native-search-box": "^0.0.13",
+    "react-native-vector-icons": "^4.5.0",
     "react-redux": "^5.0.6",
     "redux": "^3.7.2",
     "redux-logger": "^3.0.6",

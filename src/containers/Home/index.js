@@ -10,17 +10,43 @@ import {
     TouchableOpacity,
     FlatList,
 } from 'react-native';
-import Map from '../Map'
+import { Icon } from 'react-native-vector-icons/FontAwesome';
+import { ListItem } from 'react-native-elements';
 import Search from 'react-native-search-box';
+import RNGooglePlaces from 'react-native-google-places';
+import Map from '../Map'
 
 export default class App extends Component {
     constructor(props){
-        super(props)
-        this.state = {}
+        super(props);
+        this.state = {
+            predictions: []
+        };
     }
 
     searchForPredictions(txt) {
+        if (txt == '' || txt.length < 1) {
+            this.setState({predictions: []});
+            return;
+        }
+
+        RNGooglePlaces.getAutocompletePredictions(txt)
+            .then((results) => {
+                this.setState({ predictions: results });
+                console.log(results);
+            })
+            .catch((error) => console.log(error.message));
     }
+
+    _renderItem = ({item}) => (
+        <ListItem
+            leftIcon={{name:"place"}}
+            containerStyle={{backgroundColor: '#fff'}}
+            hideChevron
+            title={item.primaryText}
+            subtitle={item.secondaryText}
+        />
+    );
 
     render() {
         return (
@@ -33,10 +59,12 @@ export default class App extends Component {
                              * There many props that can be customized
                              */
                             onChangeText={(txt) => this.searchForPredictions(txt)}
+                            onCancel={() => this.setState({predictions: []})}
                         />
                         <FlatList
-                            data={[{key: 'a'}, {key: 'b'}]}
-                            renderItem={({item}) => <Text style={{backgroundColor: 'gray'}}>{item.key}</Text>}
+                            data={this.state.predictions}
+                            keyExtractor={(item, index) => item.placeID}
+                            renderItem={this._renderItem}
                         />
                     </View>
                 </Map>
