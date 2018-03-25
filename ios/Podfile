@@ -1,0 +1,10 @@
+platform :ios, '10.0'
+
+workspace 'rnMapAnything'
+
+target 'rnMapAnything' do
+  # Required by react-native-google-places
+  pod 'GoogleMaps', '2.2.0'
+  pod 'GooglePlaces', '2.2.0'
+  pod 'GooglePlacePicker', '2.2.0'
+end

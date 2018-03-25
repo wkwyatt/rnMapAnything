@@ -1,41 +1,45 @@
 /**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * @flow
+ * Home screen for map anything
  */
 
 import React, { Component } from 'react';
 import {
-    Platform,
     StyleSheet,
     Text,
-    View
+    View,
+    TouchableOpacity,
+    FlatList,
 } from 'react-native';
-
-const instructions = Platform.select({
-    ios: 'Press Cmd+R to reload,\n' +
-    'Cmd+D or shake for dev menu',
-    android: 'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import Map from '../Map'
+import Search from 'react-native-search-box';
 
 export default class App extends Component {
     constructor(props){
         super(props)
+        this.state = {}
+    }
+
+    searchForPredictions(txt) {
     }
 
     render() {
         return (
             <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to Map Anything!
-                </Text>
-                <Text style={styles.instructions}>
-                    To get started, edit Home.js
-                </Text>
-                <Text style={styles.instructions}>
-                    {instructions}
-                </Text>
+                <Map>
+                    <View style={{flex:1, marginTop:60, paddingHorizontal:20}}>
+                        <Search
+                            ref="search_box"
+                            /**
+                             * There many props that can be customized
+                             */
+                            onChangeText={(txt) => this.searchForPredictions(txt)}
+                        />
+                        <FlatList
+                            data={[{key: 'a'}, {key: 'b'}]}
+                            renderItem={({item}) => <Text style={{backgroundColor: 'gray'}}>{item.key}</Text>}
+                        />
+                    </View>
+                </Map>
             </View>
         );
     }
@@ -47,15 +51,5 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
-    },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
     },
 });
