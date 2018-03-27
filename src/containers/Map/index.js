@@ -26,7 +26,9 @@ export default class App extends Component {
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }}
-                />
+                >
+                    {this.props.markers}
+                </MapView>
                 {this.props.children}
             </View>
         );

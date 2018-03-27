@@ -14,6 +14,7 @@ import { Icon } from 'react-native-vector-icons/FontAwesome';
 import { ListItem } from 'react-native-elements';
 import Search from 'react-native-search-box';
 import RNGooglePlaces from 'react-native-google-places';
+import { Marker } from 'react-native-maps';
 import Map from '../Map'
 
 export default class App extends Component {
@@ -51,7 +52,19 @@ export default class App extends Component {
     render() {
         return (
             <View style={styles.container}>
-                <Map>
+                <Map
+                    markers={(
+                        <Marker
+                            title="TEST"
+                            description="DESC"
+                            pinColor="red"
+                            coordinate={{
+                                latitude: 37.78825,
+                                longitude: -122.4324,
+                            }}
+                        />
+                    )}
+                >
                     <View style={{flex:1, marginTop:60, paddingHorizontal:20}}>
                         <Search
                             ref="search_box"
