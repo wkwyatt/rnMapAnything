@@ -8,11 +8,21 @@ import {
     Text,
     View
 } from 'react-native';
-import MapView from 'react-native-maps';
+import MapView, { Marker } from 'react-native-maps';
 
 export default class App extends Component {
     constructor(props){
-        super(props)
+        super(props);
+        this.state = {
+            selectedLocation: props.selectedLocation
+        }
+    }
+
+    componentWillReceiveProps(nextProps) {
+        console.log('nextprops >> ', nextProps);
+        if (this.props.selectedLocation !== nextProps.selectedLocation) {
+            this.setState({selectedLocation: nextProps.selectedLocation});
+        }
     }
 
     render() {
@@ -26,8 +36,19 @@ export default class App extends Component {
                         latitudeDelta: 0.0922,
                         longitudeDelta: 0.0421,
                     }}
+                    region={this.props.selectedLocation}
                 >
-                    {this.props.markers}
+                    {this.props.markers.map((loc) => (
+                        <Marker
+                            title="TEST"
+                            description="DESC"
+                            pinColor="red"
+                            coordinate={{
+                                latitude: loc.latitude,
+                                longitude: loc.longitude,
+                            }}
+                        />
+                    ))}
                 </MapView>
                 {this.props.children}
             </View>

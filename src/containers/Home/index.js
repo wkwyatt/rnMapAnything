@@ -9,6 +9,7 @@ import {
     View,
     TouchableOpacity,
     FlatList,
+    ActivityIndicator,
 } from 'react-native';
 import { Icon } from 'react-native-vector-icons/FontAwesome';
 import { ListItem } from 'react-native-elements';
@@ -21,7 +22,15 @@ export default class App extends Component {
     constructor(props){
         super(props);
         this.state = {
-            predictions: []
+            loading: false,
+            markers: [],
+            predictions: [],
+            selectedLocation: {
+                latitude: 37.78825,
+                longitude: -122.4324,
+                latitudeDelta: 0.0922,
+                longitudeDelta: 0.0421,
+            }
         };
     }
 
@@ -34,10 +43,27 @@ export default class App extends Component {
         RNGooglePlaces.getAutocompletePredictions(txt)
             .then((results) => {
                 this.setState({ predictions: results });
-                console.log(results);
             })
             .catch((error) => console.log(error.message));
     }
+
+    onLocationPressed = (item) => {
+        this.setState({loading: true, predictions: []}, () => {
+            RNGooglePlaces.lookUpPlaceByID(item.placeID)
+                .then((results) => {
+                    const newLocation = {...results, key: item.placeID};
+                    this.setState({
+                        loading: false,
+                        markers: [...this.state.markers, newLocation],
+                        selectedLocation: {
+                            ...this.state.selectedLocation,
+                            latitude: newLocation.latitude,
+                            longitude: newLocation.longitude
+                        }
+                    });
+                });
+        });
+    };
 
     _renderItem = ({item}) => (
         <ListItem
@@ -46,24 +72,19 @@ export default class App extends Component {
             hideChevron
             title={item.primaryText}
             subtitle={item.secondaryText}
+            onPress={() => {
+                this.onLocationPressed(item);
+            }}
         />
     );
 
     render() {
+        console.log(this.state.markers);
         return (
             <View style={styles.container}>
                 <Map
-                    markers={(
-                        <Marker
-                            title="TEST"
-                            description="DESC"
-                            pinColor="red"
-                            coordinate={{
-                                latitude: 37.78825,
-                                longitude: -122.4324,
-                            }}
-                        />
-                    )}
+                    markers={this.state.markers}
+                    selectedLocation={this.state.selectedLocation}
                 >
                     <View style={{flex:1, marginTop:60, paddingHorizontal:20}}>
                         <Search
@@ -79,6 +100,7 @@ export default class App extends Component {
                             keyExtractor={(item, index) => item.placeID}
                             renderItem={this._renderItem}
                         />
+                        <ActivityIndicator animating={this.state.loading} color="red" size={40} hidesWhenStopped />
                     </View>
                 </Map>
             </View>
