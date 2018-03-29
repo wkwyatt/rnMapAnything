@@ -11,6 +11,7 @@ import {
     FlatList,
     ActivityIndicator,
 } from 'react-native';
+import DismissKeyboard from 'dismissKeyboard';
 import { Icon } from 'react-native-vector-icons/FontAwesome';
 import { ListItem } from 'react-native-elements';
 import Search from 'react-native-search-box';
@@ -34,7 +35,7 @@ export default class App extends Component {
         };
     }
 
-    searchForPredictions(txt) {
+    searchForPredictions = (txt) => {
         if (txt == '' || txt.length < 1) {
             this.setState({predictions: []});
             return;
@@ -48,13 +49,15 @@ export default class App extends Component {
     }
 
     onLocationPressed = (item) => {
+        DismissKeyboard();
         this.setState({loading: true, predictions: []}, () => {
             RNGooglePlaces.lookUpPlaceByID(item.placeID)
                 .then((results) => {
                     const newLocation = {...results, key: item.placeID};
+                    const newMarkers = (item.primaryText.toLowerCase() !== 'mapanything') ? this.state.markers : [...this.state.markers, newLocation];
                     this.setState({
                         loading: false,
-                        markers: [...this.state.markers, newLocation],
+                        markers: newMarkers,
                         selectedLocation: {
                             ...this.state.selectedLocation,
                             latitude: newLocation.latitude,
@@ -79,14 +82,13 @@ export default class App extends Component {
     );
 
     render() {
-        console.log(this.state.markers);
         return (
             <View style={styles.container}>
                 <Map
                     markers={this.state.markers}
                     selectedLocation={this.state.selectedLocation}
                 >
-                    <View style={{flex:1, marginTop:60, paddingHorizontal:20}}>
+                    <View style={{marginTop:60, paddingHorizontal:20}}>
                         <Search
                             ref="search_box"
                             /**
@@ -98,9 +100,11 @@ export default class App extends Component {
                         <FlatList
                             data={this.state.predictions}
                             keyExtractor={(item, index) => item.placeID}
+                            keyboardShouldPersistTaps
+                            keyboardDismissMode="on-drag"
                             renderItem={this._renderItem}
                         />
-                        <ActivityIndicator animating={this.state.loading} color="red" size={40} hidesWhenStopped />
+                        <ActivityIndicator animating={this.state.loading} color="red" hidesWhenStopped />
                     </View>
                 </Map>
             </View>

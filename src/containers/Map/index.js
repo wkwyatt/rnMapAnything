@@ -19,7 +19,6 @@ export default class App extends Component {
     }
 
     componentWillReceiveProps(nextProps) {
-        console.log('nextprops >> ', nextProps);
         if (this.props.selectedLocation !== nextProps.selectedLocation) {
             this.setState({selectedLocation: nextProps.selectedLocation});
         }
@@ -37,18 +36,24 @@ export default class App extends Component {
                         longitudeDelta: 0.0421,
                     }}
                     region={this.props.selectedLocation}
+                    scrollEnabled
                 >
-                    {this.props.markers.map((loc) => (
-                        <Marker
-                            title="TEST"
-                            description="DESC"
-                            pinColor="red"
-                            coordinate={{
-                                latitude: loc.latitude,
-                                longitude: loc.longitude,
-                            }}
-                        />
-                    ))}
+                    {this.props.markers.map((loc) => {
+                        console.log(loc);
+                        return (
+                            <Marker
+                                key={`Marker${loc.key}`}
+                                identifier={`Marker${loc.key}`}
+                                title={loc.name}
+                                description={loc.website || ""}
+                                pinColor="red"
+                                coordinate={{
+                                    latitude: loc.latitude,
+                                    longitude: loc.longitude,
+                                }}
+                            />
+                        )
+                    })}
                 </MapView>
                 {this.props.children}
             </View>
