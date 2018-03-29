@@ -28,7 +28,6 @@ export default class App extends Component {
         return (
             <View style={styles.container}>
                 <MapView
-                    style={styles.container}
                     initialRegion={{
                         latitude: 37.78825,
                         longitude: -122.4324,
@@ -37,20 +36,21 @@ export default class App extends Component {
                     }}
                     region={this.props.selectedLocation}
                     scrollEnabled
+                    style={styles.container}
                 >
                     {this.props.markers.map((loc) => {
                         console.log(loc);
                         return (
                             <Marker
-                                key={`Marker${loc.key}`}
-                                identifier={`Marker${loc.key}`}
-                                title={loc.name}
-                                description={loc.website || ""}
-                                pinColor="red"
                                 coordinate={{
                                     latitude: loc.latitude,
                                     longitude: loc.longitude,
                                 }}
+                                description={loc.website || ""}
+                                identifier={`Marker${loc.key}`}
+                                key={`Marker${loc.key}`}
+                                pinColor="red"
+                                title={loc.name}
                             />
                         )
                     })}

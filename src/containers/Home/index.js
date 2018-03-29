@@ -10,19 +10,19 @@ import {
     TouchableOpacity,
     FlatList,
     ActivityIndicator,
+    NetInfo,
 } from 'react-native';
 import DismissKeyboard from 'dismissKeyboard';
-import { Icon } from 'react-native-vector-icons/FontAwesome';
-import { ListItem } from 'react-native-elements';
+import { ListItem, Icon } from 'react-native-elements';
 import Search from 'react-native-search-box';
 import RNGooglePlaces from 'react-native-google-places';
-import { Marker } from 'react-native-maps';
 import Map from '../Map'
 
 export default class App extends Component {
     constructor(props){
         super(props);
         this.state = {
+            error: false,
             loading: false,
             markers: [],
             predictions: [],
@@ -35,6 +35,15 @@ export default class App extends Component {
         };
     }
 
+    componentDidMount() {
+        NetInfo.addEventListener(
+            'connectionChange',
+            (conn) => {
+                console.log('connected: ', conn);
+                if (conn.type == 'none') this.setState({error: 'No Internet Connection'});
+            });
+    }
+
     searchForPredictions = (txt) => {
         if (txt == '' || txt.length < 1) {
             this.setState({predictions: []});
@@ -45,8 +54,11 @@ export default class App extends Component {
             .then((results) => {
                 this.setState({ predictions: results });
             })
-            .catch((error) => console.log(error.message));
-    }
+            .catch((error) => {
+                console.warn(`searchForPredictions -> RNGooglePlaces -> getAutocompletePredictions ERROR: ${error.message}`);
+                this.setState({error: error.message});
+            })
+    };
 
     onLocationPressed = (item) => {
         DismissKeyboard();
@@ -64,20 +76,24 @@ export default class App extends Component {
                             longitude: newLocation.longitude
                         }
                     });
+                })
+                .catch((error) => {
+                    console.warn(`onLocationPressed -> RNGooglePlaces -> lookupPlaceByID ERROR: ${error.message}`);
+                    this.setState({error: error.message});
                 });
         });
     };
 
     _renderItem = ({item}) => (
         <ListItem
-            leftIcon={{name:"place"}}
             containerStyle={{backgroundColor: '#fff'}}
             hideChevron
-            title={item.primaryText}
-            subtitle={item.secondaryText}
+            leftIcon={{name:"place"}}
             onPress={() => {
                 this.onLocationPressed(item);
             }}
+            subtitle={item.secondaryText}
+            title={item.primaryText}
         />
     );
 
@@ -90,12 +106,9 @@ export default class App extends Component {
                 >
                     <View style={{marginTop:60, paddingHorizontal:20}}>
                         <Search
-                            ref="search_box"
-                            /**
-                             * There many props that can be customized
-                             */
                             onChangeText={(txt) => this.searchForPredictions(txt)}
                             onCancel={() => this.setState({predictions: []})}
+                            ref="search_box"
                         />
                         <FlatList
                             data={this.state.predictions}
@@ -104,6 +117,12 @@ export default class App extends Component {
                             keyboardDismissMode="on-drag"
                             renderItem={this._renderItem}
                         />
+                        {this.state.error && (
+                            <View style={styles.error}>
+                            <Icon name="error" size={160} color="#BDBDBD" />
+                            <Text style={styles.errorText}>{this.state.error}</Text>
+                        </View>
+                        )}
                         <ActivityIndicator animating={this.state.loading} color="red" hidesWhenStopped />
                     </View>
                 </Map>
@@ -114,9 +133,24 @@ export default class App extends Component {
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: '#F5FCFF',
+        flex: 1,
+        justifyContent: 'center',
     },
+    error: {
+        backgroundColor: "#EFEFEF",
+        borderColor: "#BDBDBD",
+        borderRadius: 10,
+        borderWidth: 2,
+        justifyContent: 'center',
+        marginTop: 80,
+        padding: 30,
+    },
+    errorText: {
+        color:'#333333',
+        fontFamily: 'Arial',
+        fontSize: 22,
+        textAlign: 'center'
+    }
 });
