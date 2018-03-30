@@ -61,6 +61,7 @@ export default class App extends Component {
     };
 
     onLocationPressed = (item) => {
+        console.log('pressed');
         DismissKeyboard();
         this.setState({loading: true, predictions: []}, () => {
             RNGooglePlaces.lookUpPlaceByID(item.placeID)
@@ -113,7 +114,7 @@ export default class App extends Component {
                         <FlatList
                             data={this.state.predictions}
                             keyExtractor={(item, index) => item.placeID}
-                            keyboardShouldPersistTaps
+                            keyboardShouldPersistTaps="always"
                             keyboardDismissMode="on-drag"
                             renderItem={this._renderItem}
                         />
