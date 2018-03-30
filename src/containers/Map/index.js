@@ -48,6 +48,7 @@ export default class App extends Component {
                                 }}
                                 description={loc.website || ""}
                                 identifier={`Marker${loc.key}`}
+                                image={require('../../assets/ma-marker.png')}
                                 key={`Marker${loc.key}`}
                                 pinColor="red"
                                 title={loc.name}
